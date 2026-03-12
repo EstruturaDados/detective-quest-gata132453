@@ -5,7 +5,7 @@
 #define TAM_HASH 10
 
 // ===============================
-// NÍVEL NOVATO - Árvore Binária
+// NIVEL NOVATO - Arvore Binaria
 // ===============================
 
 typedef struct Sala {
@@ -17,7 +17,7 @@ typedef struct Sala {
 Sala* criarSala(const char *nome) {
     Sala *nova = (Sala*) malloc(sizeof(Sala));
     if (nova == NULL) {
-        printf("Erro ao alocar memória para sala.\n");
+        printf("Erro ao alocar memoria para sala.\n");
         exit(1);
     }
 
@@ -39,27 +39,27 @@ void explorarSalas(Sala *raiz) {
     char opcao;
 
     while (atual != NULL) {
-        printf("\nVocê está em: %s\n", atual->nome);
+        printf("\nVoce esta em: %s\n", atual->nome);
         printf("Digite [e] esquerda, [d] direita, [s] sair: ");
         scanf(" %c", &opcao);
 
         if (opcao == 's') {
-            printf("Exploração encerrada.\n");
+            printf("Exploracao encerrada.\n");
             break;
         } else if (opcao == 'e') {
             if (atual->esquerda != NULL) {
                 atual = atual->esquerda;
             } else {
-                printf("Não há sala à esquerda.\n");
+                printf("Nao ha sala a esquerda.\n");
             }
         } else if (opcao == 'd') {
             if (atual->direita != NULL) {
                 atual = atual->direita;
             } else {
-                printf("Não há sala à direita.\n");
+                printf("Nao ha sala a direita.\n");
             }
         } else {
-            printf("Opção inválida.\n");
+            printf("Opcao invalida.\n");
         }
     }
 }
@@ -73,7 +73,7 @@ void liberarSalas(Sala *raiz) {
 }
 
 // ======================================
-// NÍVEL AVENTUREIRO - BST de Pistas
+// NIVEL AVENTUREIRO - BST de Pistas
 // ======================================
 
 typedef struct Pista {
@@ -85,7 +85,7 @@ typedef struct Pista {
 Pista* criarPista(const char *texto) {
     Pista *nova = (Pista*) malloc(sizeof(Pista));
     if (nova == NULL) {
-        printf("Erro ao alocar memória para pista.\n");
+        printf("Erro ao alocar memoria para pista.\n");
         exit(1);
     }
 
@@ -128,7 +128,7 @@ void liberarPistas(Pista *raiz) {
 }
 
 // ==========================================
-// NÍVEL MESTRE - Tabela Hash de Suspeitos
+// NIVEL MESTRE - Tabela Hash de Suspeitos
 // ==========================================
 
 typedef struct ListaPista {
@@ -146,16 +146,20 @@ typedef struct Suspeito {
 Suspeito *tabelaHash[TAM_HASH];
 
 void inicializarHash() {
-    for (int i = 0; i < TAM_HASH; i++) {
+    int i;
+    for (i = 0; i < TAM_HASH; i++) {
         tabelaHash[i] = NULL;
     }
 }
 
 int funcaoHash(const char *nome) {
     int soma = 0;
-    for (int i = 0; nome[i] != '\0'; i++) {
+    int i;
+
+    for (i = 0; nome[i] != '\0'; i++) {
         soma += nome[i];
     }
+
     return soma % TAM_HASH;
 }
 
@@ -180,7 +184,7 @@ void inserirHash(const char *pista, const char *suspeitoNome) {
     if (suspeito == NULL) {
         suspeito = (Suspeito*) malloc(sizeof(Suspeito));
         if (suspeito == NULL) {
-            printf("Erro ao alocar memória para suspeito.\n");
+            printf("Erro ao alocar memoria para suspeito.\n");
             exit(1);
         }
 
@@ -191,31 +195,36 @@ void inserirHash(const char *pista, const char *suspeitoNome) {
         tabelaHash[indice] = suspeito;
     }
 
-    ListaPista *novaPista = (ListaPista*) malloc(sizeof(ListaPista));
-    if (novaPista == NULL) {
-        printf("Erro ao alocar memória para lista de pistas.\n");
-        exit(1);
+    {
+        ListaPista *novaPista = (ListaPista*) malloc(sizeof(ListaPista));
+        if (novaPista == NULL) {
+            printf("Erro ao alocar memoria para lista de pistas.\n");
+            exit(1);
+        }
+
+        strcpy(novaPista->pista, pista);
+        novaPista->prox = suspeito->pistas;
+        suspeito->pistas = novaPista;
+        suspeito->contador++;
     }
-
-    strcpy(novaPista->pista, pista);
-    novaPista->prox = suspeito->pistas;
-    suspeito->pistas = novaPista;
-
-    suspeito->contador++;
 }
 
 void listarAssociacoes() {
+    int i;
+
     printf("\n=== SUSPEITOS E SUAS PISTAS ===\n");
 
-    for (int i = 0; i < TAM_HASH; i++) {
+    for (i = 0; i < TAM_HASH; i++) {
         Suspeito *atual = tabelaHash[i];
 
         while (atual != NULL) {
+            ListaPista *p;
+
             printf("\nSuspeito: %s\n", atual->nome);
             printf("Quantidade de pistas: %d\n", atual->contador);
             printf("Pistas associadas:\n");
 
-            ListaPista *p = atual->pistas;
+            p = atual->pistas;
             while (p != NULL) {
                 printf("  - %s\n", p->pista);
                 p = p->prox;
@@ -228,8 +237,9 @@ void listarAssociacoes() {
 
 void mostrarSuspeitoMaisProvavel() {
     Suspeito *maisProvavel = NULL;
+    int i;
 
-    for (int i = 0; i < TAM_HASH; i++) {
+    for (i = 0; i < TAM_HASH; i++) {
         Suspeito *atual = tabelaHash[i];
 
         while (atual != NULL) {
@@ -241,14 +251,16 @@ void mostrarSuspeitoMaisProvavel() {
     }
 
     if (maisProvavel != NULL) {
-        printf("\n=== SUSPEITO MAIS PROVÁVEL ===\n");
+        printf("\n=== SUSPEITO MAIS PROVAVEL ===\n");
         printf("Nome: %s\n", maisProvavel->nome);
-        printf("Número de pistas: %d\n", maisProvavel->contador);
+        printf("Numero de pistas: %d\n", maisProvavel->contador);
     }
 }
 
 void liberarHash() {
-    for (int i = 0; i < TAM_HASH; i++) {
+    int i;
+
+    for (i = 0; i < TAM_HASH; i++) {
         Suspeito *atual = tabelaHash[i];
 
         while (atual != NULL) {
@@ -272,11 +284,11 @@ void liberarHash() {
 // ===============================
 
 int main() {
-    // -------- NÍVEL NOVATO --------
+    // -------- NIVEL NOVATO --------
     Sala *hall = criarSala("Hall de Entrada");
     Sala *biblioteca = criarSala("Biblioteca");
     Sala *cozinha = criarSala("Cozinha");
-    Sala *sotao = criarSala("Sótão");
+    Sala *sotao = criarSala("Sotao");
     Sala *jardim = criarSala("Jardim");
 
     conectarSalas(hall, biblioteca, cozinha);
@@ -284,37 +296,39 @@ int main() {
     conectarSalas(cozinha, jardim, NULL);
 
     printf("=== DETECTIVE QUEST ===\n");
-    printf("\nExploração da mansão:\n");
+    printf("\nExploracao da mansao:\n");
     explorarSalas(hall);
 
-    // -------- NÍVEL AVENTUREIRO --------
-    Pista *arvorePistas = NULL;
+    // -------- NIVEL AVENTUREIRO --------
+    {
+        Pista *arvorePistas = NULL;
 
-    arvorePistas = inserirBST(arvorePistas, "Impressão digital");
-    arvorePistas = inserirBST(arvorePistas, "Pegadas na cozinha");
-    arvorePistas = inserirBST(arvorePistas, "Chave dourada");
-    arvorePistas = inserirBST(arvorePistas, "Bilhete rasgado");
-    arvorePistas = inserirBST(arvorePistas, "Luva preta");
+        arvorePistas = inserirBST(arvorePistas, "Impressao digital");
+        arvorePistas = inserirBST(arvorePistas, "Pegadas na cozinha");
+        arvorePistas = inserirBST(arvorePistas, "Chave dourada");
+        arvorePistas = inserirBST(arvorePistas, "Bilhete rasgado");
+        arvorePistas = inserirBST(arvorePistas, "Luva preta");
 
-    printf("\n=== PISTAS EM ORDEM ALFABÉTICA ===\n");
-    emOrdem(arvorePistas);
+        printf("\n=== PISTAS EM ORDEM ALFABETICA ===\n");
+        emOrdem(arvorePistas);
 
-    // -------- NÍVEL MESTRE --------
-    inicializarHash();
+        // -------- NIVEL MESTRE --------
+        inicializarHash();
 
-    inserirHash("Impressão digital", "Carlos");
-    inserirHash("Pegadas na cozinha", "Maria");
-    inserirHash("Chave dourada", "Carlos");
-    inserirHash("Bilhete rasgado", "João");
-    inserirHash("Luva preta", "Carlos");
+        inserirHash("Impressao digital", "Carlos");
+        inserirHash("Pegadas na cozinha", "Maria");
+        inserirHash("Chave dourada", "Carlos");
+        inserirHash("Bilhete rasgado", "Joao");
+        inserirHash("Luva preta", "Carlos");
 
-    listarAssociacoes();
-    mostrarSuspeitoMaisProvavel();
+        listarAssociacoes();
+        mostrarSuspeitoMaisProvavel();
 
-    // Liberação de memória
-    liberarSalas(hall);
-    liberarPistas(arvorePistas);
-    liberarHash();
+        // Liberacao de memoria
+        liberarSalas(hall);
+        liberarPistas(arvorePistas);
+        liberarHash();
+    }
 
     return 0;
 }
